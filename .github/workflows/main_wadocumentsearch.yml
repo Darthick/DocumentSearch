@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'wadocumentsearch'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_34A01F610D4846F082029D20A8BB6445 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D9CF26AD49524FC689695CFD8B71BCED }}
