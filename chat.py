@@ -45,5 +45,5 @@ def chat():
         print(error_message)
         return jsonify({'bot_response': error_message})
 
-#if __name__ == '__main__':
- #   app.run(port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
