@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with your Documents - Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #left-side {
+            flex: 1;
+            padding: 20px;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        #left-side-text {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        #chat-component {
+            display: flex;
+            flex-direction: column;
+            height: 0;
+            width: 40%;
+            margin-left: auto;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+            transition: height 0.5s;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            border-radius: 15px 15px 0 0;
+            background-color: #fff;
+            z-index: 2;
+        }
+
+        #chat-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #user-input-section {
+            display: none;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            width: 100%;
+            border-radius: 0 0 15px 15px;
+            z-index: 1;
+        }
+        
+        #user-input {
+            width: calc(100% - 20px);
+            box-sizing: border-box;
+        }
+
+        #ask-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            border-radius: 50%;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #ask-label {
+            margin-left: 10px;
+        }
+
+        #minimize-restore-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 4;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        #welcome-text {
+            padding: 10px;
+            max-width: 600px;
+            text-align: left;
+            font-weight: bold;
+            font-style: italic;
+            margin-left: 20px;
+        }
+
+        #left-side-text-border {
+            border-left: 5px solid #007bff;
+            border-right: 5px solid #007bff;
+            border-top: 5px solid #007bff;
+            border-bottom: 5px solid #007bff;
+            padding-left: 10px;
+            margin-left: 20px;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0px;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 15px;
+            padding: 10px;
+            max-width: 50%;
+            align-self: flex-end;
+            margin-bottom: 5px;
+        }
+
+        .bot-message {
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 15px;
+            padding: 10px;
+            max-width: 70%;
+            align-self: flex-start;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="left-side">
+        <div id="welcome-text">
+            <p>Welcome to the Demo on Chat with your Documents!!!</p>
+            <div id="left-side-text-border">
+                <p>Explore the seamless integration of communication and document interaction in our demo. Discover a user-friendly interface where chat effortlessly incorporates document sharing, collaborative editing, and efficient retrieval. Join us to witness the future of interactive platforms, simplifying workflows and enhancing collaboration.</p>
+            </div>
+        </div>
+    </div>
+
+    <button id="ask-button" onclick="toggleMinimizeRestore()">
+        ☁️
+        <span id="ask-label">Ask Me</span>
+    </button>
+
+    <div id="chat-component">
+        <div id="minimize-restore-button" onclick="toggleMinimizeRestore()">-</div>
+
+        <div id="chat-container">
+            <!-- Message containers will be added dynamically during runtime -->
+        </div>
+        
+        <div id="user-input-section">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatComponent = document.getElementById('chat-component');
+        const askButton = document.getElementById('ask-button');
+        const minimizeRestoreButton = document.getElementById('minimize-restore-button');
+        const userInputSection = document.getElementById('user-input-section');
+    
+        function toggleMinimizeRestore() {
+            const isVisible = chatComponent.style.height === '100%';
+            chatComponent.style.height = isVisible ? '0' : '100%';
+            userInputSection.style.display = isVisible ? 'none' : 'flex';
+        }
+    
+        function appendMessage(sender, message, className) {
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
+    
+            const messageElement = document.createElement('div');
+            messageElement.className = className;
+            messageElement.textContent = `${sender}: ${message}`;
+    
+            messageContainer.appendChild(messageElement);
+            document.getElementById('chat-container').appendChild(messageContainer);
+        }
+    
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value.trim();
+            if (userInput !== '') {
+                appendMessage('You', userInput, 'user-message');
+                document.getElementById('user-input').value = '';
+    
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'user_input=' + encodeURIComponent(userInput),
+                    });
+    
+                    if (response.ok) {
+                        const { bot_response } = await response.json();
+                        appendMessage('Chatbot', bot_response, 'bot-message');
+                    } else {
+                        throw new Error(`Failed to get response: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Error in getting response:', error.message);
+                }
+            }
+        }
+    
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+    
+</body>
+</html>
