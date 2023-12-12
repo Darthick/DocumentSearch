@@ -169,11 +169,15 @@
 
         <div id="chat-container">
             <!-- Message containers will be added dynamically during runtime -->
+            <div class="message-container">
+                <div class="bot-message">Chatbot: Hello! How can I help you today?</div>
+            </div>
         </div>
         
         <div id="user-input-section">
-            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress()">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
+            <button onclick="clearChat()">Clear Chat</button>
         </div>
     </div>
 
@@ -234,6 +238,9 @@
                 sendMessage();
             }
         }
+        function clearChat() {
+        document.getElementById('chat-container').innerHTML = '';  // Clear chat container
+    }
     </script>
     
 </body>
